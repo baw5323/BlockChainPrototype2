@@ -56,9 +56,14 @@ android {
         resources.excludes.add("/META-INF/AL2.0")
         resources.excludes.add("/META-INF/LGPL2.1")
     }
+
+
 }
 
 dependencies {
+
+    implementation ("androidx.compose.ui:ui:1.0.0")
+    implementation ("androidx.compose.material:material:1.0.0")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")

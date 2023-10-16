@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import com.dh.myapplication.core.QrCodeHandler
 import com.dh.myapplication.core.data.DeviceState
 import com.dh.myapplication.core.permissionsList
+import com.dh.myapplication.core.utils.AudioRecorder
 import com.dh.myapplication.core.utils.RequestType
 import com.dh.myapplication.core.utils.TextUtils
 import com.dh.myapplication.core.utils.UserVerifiedDialog
@@ -414,8 +415,34 @@ fun DashboardTwoContent(padding: Modifier, viewmodel: simpleViewModel, callLocat
 
     }
 
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(), contentAlignment = Alignment.Center
+    ) {
+        var isRecording by remember { mutableStateOf(false) }
+        val audioRecorder = AudioRecorder(context) // 'context' ist der Context Ihrer App
+
+        Button(
+            onClick = {
+                if (isRecording) {
+                    audioRecorder.stopRecording()
+                    // Hier können Sie die Aufnahme beenden und die Aufnahmedatei speichern
+                } else {
+                    audioRecorder.startRecording()
+                    // Hier können Sie die Aufnahme starten
+                }
+                isRecording = !isRecording
+            }
+        ) {
+            Text(text = if (isRecording) "Stop Aufnahme" else "Start Aufnahme")
+        }
+    }
+
+
+
 
 }
+
 
 
 @Composable
