@@ -52,6 +52,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.fragment.app.Fragment
+import com.google.accompanist.permissions.PermissionRequest
+import com.google.accompanist.permissions.rememberPermissionState
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -276,6 +280,30 @@ fun DashboardTwoContent(padding: Modifier, viewmodel: simpleViewModel, callLocat
 
 
 
+        Box(Modifier.fillMaxWidth(), Alignment.Center) {
+            var isRecording by remember { mutableStateOf(false) }
+            val audioRecorder = AudioRecorder(LocalContext.current)
+
+            Button(
+                onClick = {
+                    if (isRecording) {
+                        // Stop video recording
+                        stopVideoRecording()
+                        // Stop audio recording
+                        audioRecorder.stopRecording()
+                    } else {
+                        // Start video recording
+                        startVideoRecording()
+                        // Start audio recording
+                        audioRecorder.startRecording()
+                    }
+                    isRecording = !isRecording
+                }
+            ) {
+                Text(text = if (isRecording) "Stop Recording" else "Start Recording")
+            }
+        }
+
 
 
         Box(
@@ -415,28 +443,7 @@ fun DashboardTwoContent(padding: Modifier, viewmodel: simpleViewModel, callLocat
 
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(), contentAlignment = Alignment.Center
-    ) {
-        var isRecording by remember { mutableStateOf(false) }
-        val audioRecorder = AudioRecorder(context) // 'context' ist der Context Ihrer App
 
-        Button(
-            onClick = {
-                if (isRecording) {
-                    audioRecorder.stopRecording()
-                    // Hier können Sie die Aufnahme beenden und die Aufnahmedatei speichern
-                } else {
-                    audioRecorder.startRecording()
-                    // Hier können Sie die Aufnahme starten
-                }
-                isRecording = !isRecording
-            }
-        ) {
-            Text(text = if (isRecording) "Stop Aufnahme" else "Start Aufnahme")
-        }
-    }
 
 
 

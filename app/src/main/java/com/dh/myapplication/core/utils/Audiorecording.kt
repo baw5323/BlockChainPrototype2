@@ -6,14 +6,20 @@ import android.media.AudioRecord
 import android.media.AudioFormat
 import android.media.MediaRecorder
 import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
+
+
+
 class AudioRecorder(private val context: Context) {
     private var audioRecord: AudioRecord? = null
     private var isRecording = false
-    private val audioFile: File
+    private val audioWavFile: File
+    private val audioRawFile: File
 
     init {
         val audioDirectory = File(
@@ -25,7 +31,8 @@ class AudioRecorder(private val context: Context) {
             audioDirectory.mkdirs()
         }
 
-        audioFile = File(audioDirectory, "audio.wav")
+        audioWavFile = File(audioDirectory, "audio.wav")
+        audioRawFile = File(audioDirectory, "audio.raw")
     }
 
     fun startRecording() {
@@ -43,26 +50,33 @@ class AudioRecorder(private val context: Context) {
                 val buffer = ByteArray(minBufferSize)
 
                 try {
-                    val fileStream = FileOutputStream(audioFile)
+                    val wavFileStream = FileOutputStream(audioWavFile)
+                    val rawFileStream = FileOutputStream(audioRawFile)
+
                     audioRecord?.startRecording()
                     isRecording = true
 
                     while (isRecording) {
                         val bytesRead = audioRecord?.read(buffer, 0, minBufferSize)
                         if (bytesRead != AudioRecord.ERROR_INVALID_OPERATION) {
-                            fileStream.write(buffer, 0, bytesRead ?: 0)
+                            // Schreibe die Daten sowohl in die WAV-Datei als auch in die RAW-Datei
+                            wavFileStream.write(buffer, 0, bytesRead ?: 0)
+                            rawFileStream.write(buffer, 0, bytesRead ?: 0)
                         }
                     }
 
-                    fileStream.close()
+                    wavFileStream.close()
+                    rawFileStream.close()
                     audioRecord?.stop()
                     audioRecord?.release()
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
             } else {
-                // Hier können Sie den Benutzer auffordern, die Berechtigung zur Aufnahme zu erteilen
-                // Zum Beispiel, eine Meldung anzeigen oder den Benutzer zur Einstellungsseite weiterleiten
+                // Zeige eine Nachricht an, dass die Berechtigung fehlt
+                Toast.makeText(context, "Die Berechtigung zur Aufnahme fehlt.", Toast.LENGTH_SHORT).show()
+                // Zeige dann das Dialogfenster zur Berechtigungsanfrage
+                showPermissionRequestDialog()
             }
         }
     }
@@ -71,7 +85,11 @@ class AudioRecorder(private val context: Context) {
         isRecording = false
     }
 
-    fun getAudioFile(): File {
-        return audioFile
+    fun getAudioWavFile(): File {
+        return audioWavFile
+    }
+
+    fun getAudioRawFile(): File {
+        return audioRawFile
     }
 }
