@@ -11,9 +11,8 @@ import android.widget.Toast
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-
-
-
+import android.app.Activity
+import android.support.v4.app.ActivityCompat
 
 class AudioRecorder(private val context: Context) {
     private var audioRecord: AudioRecord? = null
@@ -38,7 +37,8 @@ class AudioRecorder(private val context: Context) {
     fun startRecording() {
         if (!isRecording) {
             // Überprüfen, ob die Berechtigung zur Aufnahme verfügbar ist
-            if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 val audioSource = MediaRecorder.AudioSource.MIC
                 val sampleRate = 44100
                 val channelConfig = AudioFormat.CHANNEL_IN_MONO
@@ -73,10 +73,8 @@ class AudioRecorder(private val context: Context) {
                     e.printStackTrace()
                 }
             } else {
-                // Zeige eine Nachricht an, dass die Berechtigung fehlt
-                Toast.makeText(context, "Die Berechtigung zur Aufnahme fehlt.", Toast.LENGTH_SHORT).show()
-                // Zeige dann das Dialogfenster zur Berechtigungsanfrage
-                showPermissionRequestDialog()
+                // Berechtigungen fehlen, rufen Sie die Methode zur Anforderung von Audio- und Kameraberechtigungen auf
+                requestAudioAndCameraPermissions()
             }
         }
     }
@@ -91,5 +89,14 @@ class AudioRecorder(private val context: Context) {
 
     fun getAudioRawFile(): File {
         return audioRawFile
+    }
+
+    private fun requestAudioAndCameraPermissions() {
+        val permissions = arrayOf(android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.CAMERA)
+        ActivityCompat.requestPermissions(context as Activity, permissions, PERMISSION_REQUEST_CODE)
+    }
+
+    companion object {
+        const val PERMISSION_REQUEST_CODE = 123 // Ersetzen Sie dies durch eine geeignete Konstante
     }
 }
